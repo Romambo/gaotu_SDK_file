@@ -22,7 +22,7 @@
  已经集成旧版SDK的，请移除掉 admob、facebook、firebase等相关功能和文件    
  请移除掉内购相关支持设置  
  
-1、导入SDK相关文件包含如下库文件和相关配置文件
+1、导入SDK相关文件包含如下库文件和相关配置文件  
   GTSDK.framework (此sdk为goat基础类库，常混淆类名为其他， 此GTSDK为代称)  
   AdjustSDK.framework  
   AdjustSigSDK.framework (Embed & Sign)  
@@ -60,6 +60,7 @@
 	
   5、添加相关权限说明：
   	在项目的info.plist中添加允许请求http，相机、相册、获取IDFA权限说明(说明描述请使用中文并按照项目需要进行面熟，以下描述仅供参考)：
+	
 	```
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -70,7 +71,8 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
-	
+	```
+	```
 	<key>NSCameraUsageDescription</key>
 	<string> “Goat Guides”需要访问相机，以便您可以将照片提交给客户服务</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -83,7 +85,7 @@
      
 6. 安装证书和描述文件 ，并编译工程。  
 
-**测试**
+**测试**  
 1. 在SDK初始化接口之前使用测试专用接口`[GT gt_setAdjLogLevel:1];`；
 
 2. 将gt_production 设置为NO，切换为测试服；
@@ -118,32 +120,10 @@ ATT授权弹框修改为服务器接口控制。
 
      int ATTStatus = [GT gt_getIDFAStatus];
 
-
     
 
-
-二、APNS远程推送通知（按需接入）
-
-1. 在项目中开启Push Notifications权限 ，项目target控制板中”Signing&Capabilities“ 点击 ”+Capability“ 并添加 Push Notifications。
-
-2. 在Appdelegate.h中设置代理标签<GTNotificationDelegate>
-
-
-1. 在Appdelegate.m中项目初始化之后设置代理
-
- 	```
-	  [GT sharedInstance].delegate = self;
- 	```
-4. 实现代理通知的协议方法
-
- 	```
-	   - (void)gt_didReceiveRemoteNotification:(NSDictionary *)userInfo{
-	     }        
-	```
-    
-
-三、使用
-###3.1 接口通用
+二、使用
+###3.1 接口通用  
 
 ```
 errCode  返回值
@@ -154,7 +134,7 @@ errCode  返回值
 <font size=3 color="#dd0000">SDK返回的数据格式为NSDictionary，为了数据正常，请使用NSDictionary接收。</font></br>
 
 
-###3.2 初始化
+###3.2 初始化  
 1. 导入头文件`#import <GTSDK/GT.h>`
 2. 在didFinishLaunchingWithOptions方法中进行项目的初始化。
 
@@ -164,7 +144,7 @@ application:application didFinishLaunchingWithOptions:launchOptions];
  ```
 <font size=3 color="#dd0000">配置开发模式(YES为生产模式，NO为开发模式)，上线之前切记更改为生产模式。</font></br>
 
-###3.3 用户
+###3.3 用户  
 
  **用户返回参数统一说明** 
  
@@ -194,7 +174,7 @@ typedef NS_ENUM(NSUInteger, GTLoginType) {
 };
 ```
 
-#####3.3.1 用户登录
+#####3.3.1 用户登录  
  
  @param loginType 社交登录方式。根据枚举GTLoginType传入相对应的参数
  @param viewController 当前页面的控制器
@@ -215,7 +195,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_login:params];
  ```
 
-#####3.3.2 用户绑定
+#####3.3.2 用户绑定  
  
  @param bindType 绑定的社交方式。根据枚举GTLoginType传入相对应的参数
  @param viewController 当前的视图控制器
@@ -236,7 +216,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_bind:params];
  ```     
  
-#####3.3.3 邮箱账户修改密码
+#####3.3.3 邮箱账户修改密码  
  
  @param oldPsw 旧密码
  @param newPsw 新密码
@@ -253,7 +233,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 }];
 [GT gt_alterPassword:params];
  ```
-#####3.3.4 邮箱账户找回密码
+#####3.3.4 邮箱账户找回密码  
  
  @param account 账号（邮箱）
  @param password 账户密码
@@ -271,7 +251,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 }];
 [GT gt_resetPassword:params];
  ```
-#####3.3.5 邮箱账户发送验证码
+#####3.3.5 邮箱账户发送验证码  
  
  @param account 登录账号（邮箱）
  @param completionHandler 完成之后的回调
@@ -288,7 +268,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_sendVerificationCode:params];
  ```
  
-#####3.3.6 绑定游戏角色
+#####3.3.6 绑定游戏角色  
 
 用户创建角色或修改角色名时触发
 
@@ -304,9 +284,9 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
  ```
 
 
-###3.4 储值
-#####3.4.1 储值
- **储值返回参数说明** 
+###3.4 储值  
+#####3.4.1 储值  
+ **储值返回参数说明**   
  
 |参数名|类型|说明|
 |:-----   |:-----|-----|
@@ -341,7 +321,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 ```
 
 
-###3.5 事件上报
+###3.5 事件上报  
 
  配置普通事件上报接口gt_TrackEvent的参数。
  
@@ -362,7 +342,8 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
  ```
  
  
-###3.6 客服
+###3.6 客服  
+
 #####3.6.1 展示客服界面
  
  @param controller 当前视图的控制器
@@ -406,7 +387,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [params gt_setupAgreementParamsViewController:self serverName:@"S5" serverID:@"50000" roleName:@"Terr framate" roleID:@"32003048018" roleLevel:@"115"];
 [GT gt_agreement:params];
 ```
-###3.8 Facebook分享 （国内SDK暂不支持fb分享，因此接口暂不接入）
+###3.8 Facebook分享 （国内SDK暂不支持fb分享，因此接口暂不接入）  
 #####3.8.1 分享图片和链接
 
 @param content 分享的图片或链接（请使用标准URL链接）
@@ -440,33 +421,42 @@ UIImage *image = [UIImage imageNamed:@"image"];
 ###3.9 通知（按需接入）
 
  APNS远程推送
- ```
-- (void)gt_didReceiveRemoteNotification:(NSDictionary *)userInfo{
-    NSLog(@"Recevied");
-}
- ```
+ . 在项目中开启Push Notifications权限 ，项目target控制板中”Signing&Capabilities“ 点击 ”+Capability“ 并添加 Push Notifications。
+
+   在Appdelegate.h中设置代理标签<GTNotificationDelegate>
+
+   在Appdelegate.m中项目初始化之后设置代理
+
+ 	```
+	  [GT sharedInstance].delegate = self;
+ 	```
+	 ```
+	- (void)gt_didReceiveRemoteNotification:(NSDictionary *)userInfo{
+	    NSLog(@"Recevied");
+	}
+	 ```
 
  
 ###3.10 商店评分（按需接入）
 
  @param appId 应用在商店的id（可选）
  @param controller 当前视图的控制器
-```
-NSMutableDictionary *params = [NSMutableDictionary dictionary];
-[params gt_setupEvaluationParamsAppID:@"" viewController:self];
-[GT gt_evaluate:params];
-```
+	```
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	[params gt_setupEvaluationParamsAppID:@"" viewController:self];
+	[GT gt_evaluate:params];
+	```
 
 ###3.11 游戏公告（按需接入）
 
 返回游戏公告的内容
 
 @param completionHandler 完成之后的回调
-```
-[GT gt_announcementCompletionHandler:^(int code, id  _Nullable response) {
+	```
+	[GT gt_announcementCompletionHandler:^(int code, id  _Nullable response) {
 
-}];
-```
+	}];
+	```
 
 
 ###3.12 通用日志上报<font size=3 color="#dd0000">（按需接入）</font>
@@ -474,9 +464,9 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
  通用日志上报
  
  @param key 记录上传信息的键，可用于统计加载统计等
-```
-[GT gt_reportSdkEventWithKey:@"key"];
-```
+	```
+	[GT gt_reportSdkEventWithKey:@"key"];
+	```
 
 ###3.13 记录最近一次登陆的游戏信息<font size=3 color="#dd0000">（按需接入）</font>
 
