@@ -1,16 +1,39 @@
 # gaotu_SDK_file
-#GTSDK说明文档
-#####仅以Xcode工程作示例讲解，若您使用的是其它工程请参考Xcode工程操作，若有不便敬请谅解。
-#####Xcode最低版本要求为12.0，SDK最低版本支持9.0。
-#####本套SDK仅提供API，无页面。
+#GTSDK说明文档  
+###仅以Xcode工程作示例讲解，若您使用的是其它工程请参考Xcode工程操作，若有不便敬请谅解。
+###Xcode最低版本要求为12.0，SDK最低版本支持9.0。
+###本套SDK仅提供API，无页面。
 
-##最新更新
+- **最新更新**
+- 
+    国内SDK优化更新：  
+    1、移除登陆和绑定模块的第三方功能facebook、google、gameCenter、apple等（如需相关插件，请自行集成）
+    
+    2、移除数据上报和数据收集的第三方相关功能firebase、facebook（保留adjust）
+    
+    3、付费功能移除内购付费、增加h5付费功能（接入方需在提审时候，对付费相关功能和控件进行隐藏）
+    
+    4、移除订单查询、本地商品信息获取（国内付费模块只需支持中文版、第三方付费不提供客户端订单结果查询功能）  
+    
+ **集成SDK和相关配置**
+ 
+ SDK集成步骤不全编译容易造成较多报错，请将所有步骤完成后再进行编译; 
+ 
+ 已经集成旧版SDK的，请移除掉 admob、facebook、firebase等相关功能和文件    
+ 请移除掉内购相关支持设置  
+ 
+1、导入SDK相关文件包含如下库文件和相关配置文件
+  GTSDK.framework (此sdk为goat基础类库，常混淆类名为其他， 此GTSDK为代称)  
+  AdjustSDK.framework  
+  AdjustSigSDK.framework (Embed & Sign)  
+  AdjustSdkManager.framework  
+  
+  GoatEvent-Info.json  
+  GoatService-Info.plist  
+  
+2、 在TARGETS -> General -> Frameworks,Libraries,and Embedded Content栏目下添加以下framework：
 
-###<font size=4 color="#dd0000">AdService.framework 集成</font>
-####1. 安装
-1. 在TARGETS -> General -> Frameworks,Libraries,and Embedded Content栏目下添加以下framework：
-
-   `AdServices.framework`
+   `accelerate.framework`
    
    `CoreTelephony.framework`
    
@@ -20,177 +43,59 @@
    
    `AdSupport.framework`
    
-1. Build Phases -> Link Binary With Libraries,将`AdServices.framework`设置为`Optional`;
+   `AppTrackingTransoarency.framework`
+   
+   `libc++.tbd`
+   
+   备注：并检查高图相关库的签名，只有AdjustSigSDK为动态库Embed & Sign ， 其他设置 Do not Embed  
+   
+  3、 确认除了`AdjustSigSdk.framework`之外其他库的设置为`Do not Embed`。  
+	`PROJECT` → `Build Settings`选项卡。选择All,搜索“Other Linker Flags”。将`Other Linker Flags`构建为`-ObjC`  
+	`TARGETS` → `Bulid Setting`选项卡,选择All,搜索Bitcode,设置`Enable Bitcode`为 NO。  
+	`TARGETS` → `Build Phases`选项卡,选择 `Copy Bundle Resources`,删除`upload-symbols`。  
+	
+  4、添加钥匙串共享功能：  
+  
+  	开启Keychain Sharing并设置Keychain Groups的关键字段`com.goat.gtKeyChainGroup`。  
+	
+  5、添加相关权限说明：
+  	在项目的info.plist中添加允许请求http，相机、相册、获取IDFA权限说明(说明描述请使用中文并按照项目需要进行面熟，以下描述仅供参考)：
+	```
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	
+	<key>NSCameraUsageDescription</key>
+	<string> “Goat Guides”需要访问相机，以便您可以将照片提交给客户服务</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>“Goat Guides”需要访问相册，以便您可以将照片提交给客户服务</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>“Goat Guides”需要访问相册，以便您可以将照片提交给客户服务</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>您的数据将用于向您投放个性化广告。</string>
+	```
+     
+6. 安装证书和描述文件 ，并编译工程。  
 
-####2. 测试
+**测试**
 1. 在SDK初始化接口之前使用测试专用接口`[GT gt_setAdjLogLevel:1];`；
 
 2. 将gt_production 设置为NO，切换为测试服；
 3. 卸载重装运行后在日志栏搜索`iad3`或`apple_ads`,如出现结果即表示功能正常；
 4. 注释或移除测试接口`[GT gt_setAdjLogLevel:1];`，恢复正式服。
 
-###<font size=4 color="#dd0000">Version 3.4.2</font>
-
-####变更内容
-1. 新增原厂订单状态查询接口（可选，2021-8-20移除）
-
-2. Firebase升级至7.6.0
-3. AdMob中介插件FBAudienceNetwork升级6.3.0
-
-####更新方式
-1. 替换`Goat`,`Firebase`,`AdMob`文件夹；
-
-2. 如需查询订单接口，实现教程3.4.3。
-
-###<font size=4 color="#dd0000">Version 3.4.1</font>
-
-####变更内容
+###变更内容
 ATT授权弹框修改为服务器接口控制。
-####更新方式
-1. 替换`GTSDK.framework`与 `GoatSdk_Version.json`文件；
+###更新方式
 
-2. 根据文档章节2.6 配置iOS14的适配内容；
-3. 苹果的ATT弹框启动时SDK已经调用，CP在首次启动时务必`不要调用`；
-4. 根据运营要求，在游戏内的节点调用iOS14的请求弹框，会加载引导页面与苹果的系统ATT页面，调用代码：
-   ```
-       /*
-    0: ATTrackingManagerAuthorizationStatusNotDetermined (授权状态待定)
-    1: ATTrackingManagerAuthorizationStatusRestricted (授权状态受限)
-    2: ATTrackingManagerAuthorizationStatusDenied(已拒绝)
-    3: ATTrackingManagerAuthorizationStatusAuthorized(已授权)
-    */
-    
-    [GT gt_showATTWithChannel:GoatShowATTChannelCP completionHandler:^(NSUInteger status) {
-        
-    }];
-   ```
-   注：调用时channel使用`GoatShowATTChannelCP`。
-
-###<font size=4 color="#dd0000">Version 3.4.0</font>
-####变更内容
-1. Facebook，Adjust，Firebase版本升级；
-
-2. 新增idfa弹窗引导页面`gt_requireIDFAWithSdkView`(章节2.6.2)；
-3. 新增idfa授权状态查询接口`gt_getIDFAStatus`(章节2.6.3)；
-4. 优化付费点金额币种本地化的接口`gt_getProductsWithSkuIds`(章节3.4.2)。
-
-####更新方式
-1. 替换对应Goat，Facebook，Adjust，Firebase文件夹内的文件；
-
-2. Firebase原来的framework本次均变为xcframework，注意将旧包中的Firebase系列的framework删除；
-3. 更新和插入以下代码(章节2.5.1)；
-
-   3.1 在最后的` </dict> `元素前，插入以下代码，并将代码中包含的your-facebook-id 和your-app-name修改为提供的id和name。
-
- ```
-<key>CFBundleURLTypes</key> <array> <dict> <key>CFBundleURLSchemes</key> <array> <string>fb{your-facebook-id}</string> </array> </dict> </array> <key>FacebookAppID</key> <string>{your-facebook-id}</string> <key>FacebookDisplayName</key> <string>{your-app-name}</string>
-<key>LSApplicationQueriesSchemes</key> <array> <string>fbapi</string> <string>fbapi20130214</string> <string>fbapi20130410</string> <string>fbapi20130702</string> <string>fbapi20131010</string> <string>fbapi20131219</string> <string>fbapi20140410</string> <string>fbapi20140116</string> <string>fbapi20150313</string> <string>fbapi20150629</string> <string>fbapi20160328</string> <string>fbauth</string> <string>fb-messenger-share-api</string> <string>fbauth2</string> <string>fbshareextension</string> </array>
- ```
-1. 如果使用了FirebaseCrashlytics，将`upload-symbols`删除；
-
-####错误排查
-1. Building for iOS, but the linked and embedded framework 'AdjustSigSdk.framework' was built for iOS + iOS Simulator.
-
-   解决方案：
-```
-    Open Xcode
-    Go to your project's "Build Settings"
-    Search for "Validate Workspace"
-    Set it to "YES"
-```
-
-#SDK集成
-
-##1. 安装
-<font size=3 color="#dd0000">
-SDK集成步骤不全编译容易造成较多报错，请将所有步骤完成后再进行编译;
-
-如果不需要集成AdMob广告功能或Crash崩溃收集功能，请将对应的文件夹删除。
-
-AdMob ->`AdMob`
-Crash ->`Firebase/FirebaseCrashlytics`
-</font></br>
-
-1. 将GOAT_LIB文件夹移至 Xcode 项目的根目录并将其添加至所有目标。
-       ![](https://doc.goatgames.com/server/../Public/Uploads/2020-11-11/5faba438a763f.png)
-
-1. TARGETS → General → Frameworks,Libraries,and Embedded Content 添加以下AdjustSigSdk.framework并选择 Embed & Sign。
-
-    `AdjustSigSdk.framework`
-
-  继续添加高图SDK插件
- `GTSDK.framework`
- `AdjustSdkManager.framework`
- `FacebookSdkManager.framework`
- `FirebaseSdkManager.framework`
- 
- 添加系统依赖库
- `iAd.framework`
- `AdSupport.framework`
- `CoreTelephony.framework`
- `Accelerate.framewor`
- `libc++.tbd`
- 
- ​确认除了`AdjustSigSdk.framework`之外其他库的设置为`Do not Embed`。
-1. ​`PROJECT` → `Build Settings`选项卡。选择All,搜索“Other Linker Flags”。将`Other Linker Flags`构建为`-ObjC`
-2. `TARGETS` → `Build Settings`选项卡。选择All,搜索“Other Linker Flags”。将`Other Linker Flags`构建为`$(inherited)`
-3. `TARGETS` → `Bulid Setting`选项卡,选择All,搜索Bitcode,设置`Enable Bitcode`为 NO。
-4. `TARGETS` → `Build Phases`选项卡,选择 `Copy Bundle Resources`,删除`upload-symbols`。
-5. `TARGETS` → `Bulid Setting`,选择All,搜索Swift Language Version,将`Swift Language Version`设置为`Swift 4`。
-6. 安装证书和描述文件。
-
-
-
-##2. 配置
-<font size=3 color="#dd0000">
-提示：
-为了保障项目的正常运行，除红色字体“按需接入”根据产品需求自由接入外，其他内容请务必保证100%接入并通过验证。</font>
-
-####2.1 Sign In With Apple
-使用苹果登陆。
-苹果登陆功能需要Xcode 11以上的版本（请勿使用Xcode 11.2）
-<font size=3 color="#dd0000">苹果登陆功能需对手机系统版本进行识别判断，仅13.0以上版本可以使用和显示</font></br>
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38f8412f52e.png)
-####2.2 IAP
-开启In-App Purchase功能。
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38fa737bc83.png)
-####2.3 Keychain
-开启Keychain Sharing并设置Keychain Groups的关键字段`com.goat.gtKeyChainGroup`。
-<font size=3 color="#dd0000">请务必配置此项，否则用户数据将异常。</font></br>
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38f9a67185d.png)
-####2.4 Game Center
-开启Game Center功能。
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38fd0a0b2f7.png)
-
-####2.5 Facebook
-1. 在 Xcode 中，右键点击项目的 Info.plist 文件并选择 Open As（打开方式）->  Source Code（源代码）。
-
-```2. 在最后的` </dict> `元素前，插入以下代码，并将代码中包含的your-facebook-id 和your-app-name修改为提供的id和name。
-
- ```
-<key>CFBundleURLTypes</key> <array> <dict> <key>CFBundleURLSchemes</key> <array> <string>fb{your-facebook-id}</string> </array> </dict> </array> <key>FacebookAppID</key> <string>{your-facebook-id}</string> <key>FacebookDisplayName</key> <string>{your-app-name}</string>
-<key>LSApplicationQueriesSchemes</key> <array> <string>fbapi</string> <string>fbapi20130214</string> <string>fbapi20130410</string> <string>fbapi20130702</string> <string>fbapi20131010</string> <string>fbapi20131219</string> <string>fbapi20140410</string> <string>fbapi20140116</string> <string>fbapi20150313</string> <string>fbapi20150629</string> <string>fbapi20160328</string> <string>fbauth</string> <string>fb-messenger-share-api</string> <string>fbauth2</string> <string>fbshareextension</string> </array>
- ```
-
-``` 
-
-####2.6 iOS14 适配
-#####2.6.1 配置
-<font size=3 color="#dd0000">
-适配iOS14则最低版本为Xcode12。
-弹框
-苹果的idfa弹窗每次安装只弹出一次。如需多次测试请卸载重装。
-</font>
-
-1. 在项目的info.plist中添加Key值`Privacy - Tracking Usage Description`,Type为字符串，Value内容:
-   ```
-1.   Your data will be used to deliver personalized ads to you. 
-   ```
-
-1. TARGETS → General → Frameworks,Libraries,and Embedded Content 下添加`AppTrackingTransparency.framework`,并设置为`Do Not Embed`;
-2. 在Build Phases中，将`AppTrackingTransparency.framework`设置为`Optional`;
-
-#####2.6.2 请求数据跟踪权限弹窗
+**集成SDK相关API**
+ 一、请求数据跟踪权限弹窗
 
 1. 苹果的ATT弹框启动时SDK已经调用，cp在启动时务必不要调用；
 2. 根据运营要求，在游戏内的节点调用iOS14的请求弹框，会加载引导页面与苹果的系统ATT页面，调用代码：
@@ -208,60 +113,37 @@ Crash ->`Firebase/FirebaseCrashlytics`
    ```
    注：调用时channel 务必使用`GoatShowATTChannelCP`。
    
-1. 效果:
-    ![](https://doc.goatgames.com/server/../Public/Uploads/2020-11-11/5fabacc5375a3.png)
     
-#####2.6.3 获取数据跟踪授权状态
+3 获取数据跟踪授权状态
 
      int ATTStatus = [GT gt_getIDFAStatus];
 
 
     
-####2.7 Push Notifications<font size=3 color="#dd0000">（按需接入）</font>
 
-APNS远程推送通知
 
-1. 开启Push Notifications。
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38fa0f0efc7.png)
+二、APNS远程推送通知（按需接入）
+
+1. 在项目中开启Push Notifications权限 ，项目target控制板中”Signing&Capabilities“ 点击 ”+Capability“ 并添加 Push Notifications。
+
 2. 在Appdelegate.h中设置代理标签<GTNotificationDelegate>
-![](https://doc.goatgames.com/server/../Public/Uploads/2019-03-19/5c90cd94a6e18.png)
+
 
 1. 在Appdelegate.m中项目初始化之后设置代理
 
- ```
-[GT sharedInstance].delegate = self;
- ```
+ 	```
+	  [GT sharedInstance].delegate = self;
+ 	```
 4. 实现代理通知的协议方法
 
- ```
-- (void)gt_didReceiveRemoteNotification:(NSDictionary *)userInfo{
-}        
-```
+ 	```
+	   - (void)gt_didReceiveRemoteNotification:(NSDictionary *)userInfo{
+	     }        
+	```
     
-####2.8 Associated Domains<font size=3 color="#dd0000">（按需接入）</font>
 
-深度链接
-开启Associated Domains功能并设置Domains关键字段。
-![](https://doc.goatgames.com/server/../Public/Uploads/2020-02-04/5e38fc2783ff5.png)
-
-####2.9 相机相册权限
-#####2.9.1 申请相机访问权限：
- 
- 1. 在Info.plist中添加条目`Privacy - Camera Usage Description`
- 
- 2. 内容设置为`"应用名" need to access the camera so you can submit photos to customer service.`
- 3. `应用名`修改为正确的应用名
- 
-#####2.9.2 申请相册访问权限：
-1. 在Info.plist中添加条目`Privacy - Photo Library Additions Usage Description`
-
-2. 内容设置为`"应用名" need to access the photos so you can submit photos to customer service.`
-3. `应用名`修改为正确的应用名
-
-   
-
-##3. 使用
-####3.1 接口通用
+三、使用
+###3.1 接口通用
 
 ```
 errCode  返回值
@@ -272,7 +154,7 @@ errCode  返回值
 <font size=3 color="#dd0000">SDK返回的数据格式为NSDictionary，为了数据正常，请使用NSDictionary接收。</font></br>
 
 
-####3.2 初始化
+###3.2 初始化
 1. 导入头文件`#import <GTSDK/GT.h>`
 2. 在didFinishLaunchingWithOptions方法中进行项目的初始化。
 
@@ -282,10 +164,7 @@ application:application didFinishLaunchingWithOptions:launchOptions];
  ```
 <font size=3 color="#dd0000">配置开发模式(YES为生产模式，NO为开发模式)，上线之前切记更改为生产模式。</font></br>
 
-####3.3 用户
-
- **用户验证流程** 
- ![](https://doc.goatgames.com/server/../Public/Uploads/2019-09-26/5d8c84e694b26.png)
+###3.3 用户
 
  **用户返回参数统一说明** 
  
@@ -310,10 +189,8 @@ application:application didFinishLaunchingWithOptions:launchOptions];
 ```
 typedef NS_ENUM(NSUInteger, GTLoginType) {
     GTLoginTypeDefault,
-    GTLoginTypeFacebook,
-    GTLoginTypeGameCenter,
     GTLoginTypeCommon,
-    GTLoginTypeApple,
+
 };
 ```
 
@@ -427,7 +304,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
  ```
 
 
-####3.4 储值
+###3.4 储值
 #####3.4.1 储值
  **储值返回参数说明** 
  
@@ -463,62 +340,8 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_pay:params];
 ```
 
-#####3.4.2 获取本地化付费信息<font size=3 color="#dd0000">（按需接入）</font>
 
-|参数名|类型|说明|
-|:-----   |:-----|-----|
-|skuIds	  |NSSet	   |商品Id的集合
-
-|返回值|类型|说明|
-|:-----   |:-----|-----|
-|products  |NSDictionary   |本地化商品信息，第一层key为skuId，第二层为商品信息
-|mFormatPrice	  |NSString |统一格式化信息 e.g. USD$0.99
-|mPrice	  |NSString |本地价格
-|mPriceCurrencyCode	  |NSString |本地币种
-|mPriceCurrencySymbol	  |NSString |本地货币符号
-|mTitle	  |NSString |商品名称
-|mDescription	  |NSString |商品描述
-
-```
-NSSet *skuIds = [NSSet setWithObjects:@"skuId1",@"skuId2",@"skuId3",@"skuId4",@"skuId5", nil];   
-
-[GT gt_getProductsWithSkuIds:skuIds completionHandler:^(NSDictionary * _Nullable products) {
-    
-    NSDictionary *sku1 = products[@"skuId1"];
-    NSString *price = sku1[mPrice];
-    NSString *currency = sku1[mPriceCurrencyCode];
-    NSString *formatePrice = sku1[mFormatPrice];
-    
-    NSDictionary *sku2 = products[@"skuId2"];
-    NSString *price2 = sku2[mPrice];
-    NSString *currency2 = sku2[mPriceCurrencyCode];
-    NSString *formatePrice2 = sku2[mFormatPrice];
-    
-    //more skuIds...
-}];
-```
-
-#####3.4.3 查询订单状态<font size=3 color="#dd0000">（按需接入）</font>
-
-|参数名|类型|说明|
-|:-----   |:-----|-----|
-|cpOrderId	  |NSString	   |原厂订单Id
-
-```
-    [GT gt_queryCpOrderId:@"cpOrderId" completionHandler:^(int code, id  _Nullable response) {
-        
-        if (code == GT_SERVER_SUCCESS) {
-            //success
-            //订单状态，取值：unpaid，payment，complete, cancel
-            NSString *orderStatus = response[@"data"][@"status"];
-            if ([orderStatus isEqualToString:@"payment"] || [orderStatus isEqualToString:@"complete"]) {
-                //paid
-            }
-        }
-    }];
-```
-
-####3.5 事件上报
+###3.5 事件上报
 
  配置普通事件上报接口gt_TrackEvent的参数。
  
@@ -539,7 +362,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
  ```
  
  
-####3.6 客服
+###3.6 客服
 #####3.6.1 展示客服界面
  
  @param controller 当前视图的控制器
@@ -568,7 +391,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];[params gt_setupA
 [GT gt_getCustomerUnreadMessage:params];
 ```
 
-####3.7 用户协议<font size=3 color="#dd0000">（按需接入）</font>
+###3.7 用户协议<font size=3 color="#dd0000">（按需接入）</font>
 
  展示用户协议界面
  
@@ -583,7 +406,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [params gt_setupAgreementParamsViewController:self serverName:@"S5" serverID:@"50000" roleName:@"Terr framate" roleID:@"32003048018" roleLevel:@"115"];
 [GT gt_agreement:params];
 ```
-####3.8 Facebook分享<font size=3 color="#dd0000">（按需接入）</font>
+###3.8 Facebook分享 （国内SDK暂不支持fb分享，因此接口暂不接入）
 #####3.8.1 分享图片和链接
 
 @param content 分享的图片或链接（请使用标准URL链接）
@@ -614,7 +437,7 @@ UIImage *image = [UIImage imageNamed:@"image"];
 [GT gt_share:params];
  ```
  
-####3.9 通知<font size=3 color="#dd0000">（按需接入）</font>
+###3.9 通知（按需接入）
 
  APNS远程推送
  ```
@@ -624,7 +447,7 @@ UIImage *image = [UIImage imageNamed:@"image"];
  ```
 
  
-####3.10 商店评分<font size=3 color="#dd0000">（按需接入）</font>
+###3.10 商店评分（按需接入）
 
  @param appId 应用在商店的id（可选）
  @param controller 当前视图的控制器
@@ -634,7 +457,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_evaluate:params];
 ```
 
-####3.11 游戏公告<font size=3 color="#dd0000">（按需接入）</font>
+###3.11 游戏公告（按需接入）
 
 返回游戏公告的内容
 
@@ -646,7 +469,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 ```
 
 
-####3.12 通用日志上报<font size=3 color="#dd0000">（按需接入）</font>
+###3.12 通用日志上报<font size=3 color="#dd0000">（按需接入）</font>
 
  通用日志上报
  
@@ -655,7 +478,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
 [GT gt_reportSdkEventWithKey:@"key"];
 ```
 
-####3.13 记录最近一次登陆的游戏信息<font size=3 color="#dd0000">（按需接入）</font>
+###3.13 记录最近一次登陆的游戏信息<font size=3 color="#dd0000">（按需接入）</font>
 
  @param info 游戏内容参数，参数任意字符串，SDK侧不限制其内容
  @param completionHandler 完成之后的回调
@@ -669,7 +492,7 @@ NSMutableDictionary *params = [NSMutableDictionary dictionary];
     ```
 
 
-####3.14 其他API<font size=3 color="#dd0000">（按需接入）</font>
+###3.14 其他API<font size=3 color="#dd0000">（按需接入）</font>
 
 #####3.14.1 获取设备id 
 e.g., "7E764935-24CB-4EE3-B718-2BB2C5BA5A0A".
@@ -699,8 +522,10 @@ e.g., "WIFI".
 e.g., "en".
 `[GT gt_getSystemLanguage]`
 
-##4. 出包
-由于项目使用的动态框架，打包时需要针对 i386 和 x86_64 架构剥离二进制:
+
+**出包**
+
+由于项目提审不支持模拟器，如果您在提审包的时候有相关报错，那么，打包时需要针对 i386 和 x86_64 架构剥离二进制:
     
 1. 在项目导航器中选择您的项目。
 
@@ -758,13 +583,8 @@ e.g., "en".
 ```
 6. 清理和重建。
 
-   <font size=3 color="#dd0000">如果集成了FirebaseCrashlytics的崩溃收集框架，则需要更多操作：</font>
-1. 转到 ​Build Phases​ 选项卡，点击 Copy Bundle Resources​。
-2. 如果目录下包含`upload-symbols`文件则删除该文件。
-3. 清理和重建。
 
-
-##5. 故障排除
+**故障排除**
 
 ####5.1. "image not found"错误 如果您遇到如下所示的错误：
 
@@ -773,13 +593,12 @@ e.g., "en".
       Referenced from: /var/containers/Bundle/Application/5A7F1CE0-E076-4EE4-A4E3-BE9A1EEC7659/Goat Guides.app/GTSDK Guides
       Reason: image not found
                   
-您正在使用动态框架，需要添加到Embedded Binaries：
+报错的内容中包含的库属于动态框架，需要添加到Embedded Binaries：
 
   1. 在项目导航器中选择您的项目。
   2. 在主视图的左侧选择您的目标。
-  3. 转到General 选项卡，选择Embedded Binaries 点击 ​+​ 按钮​。
-  4. 选择GOAT_LIB文件夹下的GTSDK.framework之后点击Add。 
-  5. 清理和重建。
+  3. 转到General 选项卡，选择Embedded Binaries 点击 ​+​ 按钮​，xcode11之后 需要在”Framework,Libraries,andEmbedded Content“中找到对应的库，在库后面的Embed中切换为”Embed&Sign“。 
+  4. 清理和重建。
 
 ####5.2. "Undefined symbol: _vDSP_mmul/_vDSP_dotpr/_vDSP_vclip"
 
@@ -808,32 +627,14 @@ Failed to verify bitcode in AdjustSdk.framework/AdjustSdk:
 5. 将[​此链接​](https://pastebin.com/TWAh5tAW "​此链接​")中的代码片段复制到输入区域。
 6. 清理和重建。
 
-####5.4. "Terminating app due to uncaught exception"
-'InvalidOperationException', reason: 'fb00000000000 is not registered as a URL scheme. Please add it in your Info.plist'
-
-1. FacebookId配置和项目不一致，请确认Bundle Id和Facebook Id是否匹配。
-2. 转到Info -> URL Types -> URL Schemes，填充"fb正确的id",例如：`fb22000000000000`。
-3. 清理和重建。
-
-####5.5. dyld: Library not loaded: @rpath/libswiftCore.dylib
+####5.4. dyld: Library not loaded: @rpath/libswiftCore.dylib
 
 1. 这是由于sdk版本内包含了swift的内容，Xcode12以下版本需要进行兼容。
 2. 将Build Settings > Always Embed Swift Standard Libraries设置为YES。
 3. 这一栏的内容原名为Embedded Content Contains Swift Code。
 
-####5.6. Undefined symbols for architecture arm64: method descriptor for Swift.CustomStringConvertible.description.getter : Swift.String"
-```
-ld: warning: Could not find or use auto-linked library 'swiftCoreGraphics'
-ld: warning: Could not find or use auto-linked library 'swiftDarwin'
-ld: warning: Could not find or use auto-linked library 'swiftUIKit'
-·····
-Undefined symbols for architecture arm64:
-  "method descriptor for Swift.CustomStringConvertible.description.getter : Swift.String"
-```
-1. 这是facebook-ios-sdk v7以上要求应用程序使用swift界面，因此项目中需要包含swift文件。
-2. 在项目中新建一个空的swift文件即可解决。
 
-####5.7. -1000 A server with the specified hostname could not be found
+####5.5. -1000 A server with the specified hostname could not be found
 
 1. 打开设问题备（iPad/iPod/iPhone）的设置。
 2. 点击Wi-Fi，然后点击Wi-Fi名称后面的 "i"。
@@ -848,55 +649,6 @@ Undefined symbols for architecture arm64:
 3. Search for "Validate Workspace"
 4. Set it to "YES"
 
-#6. 集成崩溃检测框架<font size=5 color="#dd0000">（按需接入）</font>
-
-<font size=3 color="#dd0000">
-提示：
-如果游戏项目中已经集成了Cransh工具，例如Bugly，请勿集成本框架，以免相互干扰。</font>
-
-1. 将`Firebase`文件夹倒入导入到项目中。
-
-2. `Target` -> `Build Phases`标签页，找到 Debug Information Format，将其设置为`DWARF with dSYM File`。
-3. `Target` -> `Build Phases`标签页，然后依次点击 + > New Run Script Phase。
-4. 展开随即显示的新 Run Script 部分。在脚本字段（位于 Shell 字段下）中，添加一个新的运行脚本：
-
-    ```
-    "${PROJECT_DIR}/GOAT_LIB/Firebase/FirebaseCrashlytics/run"
-    ```
-  
-  路径为文件的本地路径，确保编译时可以访问到。
-    
-1. 在构建阶段的 Input Files 字段中提供以下内容：
-   注意下列为两条内容，排列顺序见下图
-    ```
-    $(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)
-    ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}
-    ```
-      
-    ![](https://doc.goatgames.com/server/../Public/Uploads/2020-11-18/5fb41499ebd1c.png)
 
 
-    
-<font size=3 color="#dd0000">注意：
-请确保您的该Run Script构建是此项目的最后一个构建阶段，否则 Crashlytics 将无法正确初始化。</font>
-
-    
-###可能遇到的问题
-```
-    Undefined symbols for architecture arm64:
-      "vtable for __cxxabiv1::__class_type_info", referenced from:
-          typeinfo for std::__1::__basic_string_common<true> in Crashlytics(CLSException.o)
-      NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
-      "typeinfo for std::exception", referenced from:
-          GCC_except_table1 in Crashlytics(CLSException.o)
-          typeinfo for std::exception const* in Crashlytics(CLSException.o)
-      NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
-```
-    原因:具体错误是因为libc++没有互连。
-    
-    Crashlytics 3.0需要`libc++.tbd`（不是`libstdc++`）,`libz.tbd`,`SystemConfiguration.framework`和`Security.framework`。
-        
-    解决方案：在Embedded Content中`libc++.tbd`,`libz.tbd`,`SystemConfiguration.framework`和`Security.framework`。
-
-将 SDK 添加到应用后，Crashlytics 会自动开始侦听并收集崩溃报告。
-
+   
