@@ -18,6 +18,8 @@
     
  **集成说明**  
  
+ ***说明：国内马甲包类的SDK是经过混淆的，原SDK名为GTSDK，header名为GT.h，混淆后”GTSDK“和”GT“皆变，需要新老客户进行进行替换，如：`[GT gt_login]`替换为`[XXX gt_login]`，”XXX“为混淆后的头文件名。文档中API说明，按照原SDK描述。***
+ 
  1、如果您是首次接入用户，请按照下面步骤进行接入，由于国内SDK做了混淆，相关库和类名可参考demo。  
  
  2、如果您不是首次接入goat，请仔细阅读最近更新中内容，移除的相关模块需要清理（除adjust外的所有第三方功能），相关api如果有调用，需要进行移除。
@@ -149,7 +151,7 @@ errCode  返回值
 
 
 ###3.2 初始化  
-1. 导入头文件`#import <GTSDK/GT.h>`
+1. 导入头文件`#import <GTSDK/GT.h>`(这里具体名称需按照给定的SDK名称和头文件名)
 2. 在didFinishLaunchingWithOptions方法中进行项目的初始化。
 
  ```
