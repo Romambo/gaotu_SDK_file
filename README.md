@@ -68,12 +68,12 @@
 	
   4、添加钥匙串共享功能：  
   
-  	开启Keychain Sharing并设置Keychain Groups的关键字段`com.goat.gtKeyChainGroup`。  
+  	开启Keychain Sharing并设置Keychain Groups的关键字段com.goat.gtKeyChainGroup  
 	
   5、添加相关权限说明：
   	在项目的info.plist中添加允许请求http，相机、相册、获取IDFA权限说明(说明描述请使用中文并按照项目需要进行面熟，以下描述仅供参考)：
 	
-	```
+	
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -83,8 +83,8 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
-	```
-	```
+	
+	
 	<key>NSCameraUsageDescription</key>
 	<string> “Goat Guides”需要访问相机，以便您可以将照片提交给客户服务</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -93,7 +93,7 @@
 	<string>“Goat Guides”需要访问相册，以便您可以将照片提交给客户服务</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>您的数据将用于向您投放个性化广告。</string>
-	```
+	
      
 6. 安装证书和描述文件 ，并编译工程。  
 
