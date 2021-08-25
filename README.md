@@ -43,6 +43,8 @@
   
   GoatEvent-Info.json  
   GoatService-Info.plist  
+  GoatSdk_Version.json  
+  SVProgressHUD.bundle  
   
 2、 在TARGETS -> General -> Frameworks,Libraries,and Embedded Content栏目下添加以下framework：
 
